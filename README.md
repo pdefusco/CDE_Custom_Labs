@@ -647,6 +647,166 @@ cde job create --name cde_spark_job_gold_user001 \
   --vcluster-endpoint https://8wcx5dqp.cde-qngfhb5x.pdf-aw-c.a465-9q4k.cloudera.site/dex/api/v1
 ```
 
+```
+curl -X 'POST' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "defaultVariables": {
+    "additionalProp1": "string",
+    "additionalProp2": "string",
+    "additionalProp3": "string"
+  },
+  "hidden": true,
+  "mounts": [
+    {
+      "dirPrefix": "string",
+      "resourceName": "string"
+    }
+  ],
+  "name": "cde_spark_job_bronze_user001",
+  "pipeline": {
+    "resource": {
+      "name": "string",
+      "path": "string"
+    },
+    "source": "string"
+  },
+  "spark": {
+    "args": [
+      "string"
+    ],
+    "conf": {
+      "additionalProp1": "string",
+      "additionalProp2": "string",
+      "additionalProp3": "string"
+    },
+    "driverCores": 0,
+    "driverMemory": "string",
+    "executorCores": 0,
+    "executorMemory": "string",
+    "file": "string",
+    "logLevel": "string",
+    "name": "string",
+    "numExecutors": 0,
+    "proxyUser": "string",
+    "pythonEnvResourceName": "string"
+  },
+  "type": "string",
+  "workloadCredentials": [
+    "string"
+  ]
+}'
+```
+
+```
+curl -X 'POST' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "defaultVariables": {
+    "additionalProp1": "string",
+    "additionalProp2": "string",
+    "additionalProp3": "string"
+  },
+  "hidden": true,
+  "mounts": [
+    {
+      "dirPrefix": "string",
+      "resourceName": "string"
+    }
+  ],
+  "name": "cde_spark_job_silver_user001",
+  "pipeline": {
+    "resource": {
+      "name": "string",
+      "path": "string"
+    },
+    "source": "string"
+  },
+  "spark": {
+    "args": [
+      "string"
+    ],
+    "conf": {
+      "additionalProp1": "string",
+      "additionalProp2": "string",
+      "additionalProp3": "string"
+    },
+    "driverCores": 0,
+    "driverMemory": "string",
+    "executorCores": 0,
+    "executorMemory": "string",
+    "file": "string",
+    "logLevel": "string",
+    "name": "string",
+    "numExecutors": 0,
+    "proxyUser": "string",
+    "pythonEnvResourceName": "string"
+  },
+  "type": "string",
+  "workloadCredentials": [
+    "string"
+  ]
+}'
+```
+
+```
+curl -X 'POST' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "defaultVariables": {
+    "additionalProp1": "string",
+    "additionalProp2": "string",
+    "additionalProp3": "string"
+  },
+  "hidden": true,
+  "mounts": [
+    {
+      "dirPrefix": "string",
+      "resourceName": "string"
+    }
+  ],
+  "name": "cde_spark_job_gold_user001",
+  "pipeline": {
+    "resource": {
+      "name": "string",
+      "path": "string"
+    },
+    "source": "string"
+  },
+  "spark": {
+    "args": [
+      "string"
+    ],
+    "conf": {
+      "additionalProp1": "string",
+      "additionalProp2": "string",
+      "additionalProp3": "string"
+    },
+    "driverCores": 0,
+    "driverMemory": "string",
+    "executorCores": 0,
+    "executorMemory": "string",
+    "file": "string",
+    "logLevel": "string",
+    "name": "string",
+    "numExecutors": 0,
+    "proxyUser": "string",
+    "pythonEnvResourceName": "string"
+  },
+  "type": "string",
+  "workloadCredentials": [
+    "string"
+  ]
+}'
+```
+
+
 In your editor, open the Airflow DAG "004_airflow_dag_git" and edit your username variable at line 54.
 
 ![alt text](img/username-dag.png)
@@ -669,6 +829,59 @@ cde job create --name airflow-orchestration-user001 \
   --mount-1-resource sparkAppRepoPrdUser001 \
   --dag-file de-pipeline-bank/airflow/004_airflow_dag_git.py\
   --vcluster-endpoint https://8wcx5dqp.cde-qngfhb5x.pdf-aw-c.a465-9q4k.cloudera.site/dex/api/v1
+```
+
+```
+curl -X 'POST' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "airflow": {
+    "conf": {
+      "additionalProp1": {}
+    },
+    "config": {
+      "additionalProp1": "string",
+      "additionalProp2": "string",
+      "additionalProp3": "string"
+    },
+    "dagFile": "string",
+    "fileMounts": [
+      {
+        "dirPrefix": "string",
+        "resourceName": "string"
+      }
+    ]
+  },
+  "mounts": [
+    {
+      "dirPrefix": "string",
+      "resourceName": "string"
+    }
+  ],
+  "name": "string",
+  "pipeline": {
+    "resource": {
+      "name": "string",
+      "path": "string"
+    },
+    "source": "string"
+  },
+  "schedule": {
+    "catchup": true,
+    "cronExpression": "string",
+    "dependsOnPast": true,
+    "enabled": true,
+    "end": "string",
+    "nextExecution": "string",
+    "paused": true,
+    "pausedUponCreation": true,
+    "start": "string",
+    "user": "string"
+  },
+  "type": "string",
+}'
 ```
 
 ![alt text](img/jobs-cde.png)

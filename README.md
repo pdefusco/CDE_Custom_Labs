@@ -325,6 +325,110 @@ Using the API, run a CDE Spark Submit with the provided Pyspark and Iceberg appl
 cde spark submit code/spark/icebergApp.py
 ```
 
+```
+curl -X 'POST' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "defaultVariables": {
+    "additionalProp1": "string",
+    "additionalProp2": "string",
+    "additionalProp3": "string"
+  },
+  "hidden": true,
+  "mounts": [
+    {
+      "dirPrefix": "string",
+      "resourceName": "string"
+    }
+  ],
+  "name": "string",
+  "pipeline": {
+    "resource": {
+      "name": "string",
+      "path": "string"
+    },
+    "source": "string"
+  },
+  "spark": {
+    "args": [
+      "string"
+    ],
+    "conf": {
+      "additionalProp1": "string",
+      "additionalProp2": "string",
+      "additionalProp3": "string"
+    },
+    "driverCores": 0,
+    "driverMemory": "string",
+    "executorCores": 0,
+    "executorMemory": "string",
+    "file": "string",
+    "logLevel": "string",
+    "name": "string",
+    "numExecutors": 0,
+    "proxyUser": "string",
+    "pythonEnvResourceName": "string"
+  },
+  "type": "string",
+  "workloadCredentials": [
+    "string"
+  ]
+}'
+```
+
+```
+curl -X 'POST' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs/myJob/run' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "hidden": true,
+  "overrides": {
+    "airflow": {
+      "conf": {
+        "additionalProp1": {}
+      },
+      "config": {
+        "additionalProp1": "string",
+        "additionalProp2": "string",
+        "additionalProp3": "string"
+      }
+    },
+    "spark": {
+      "args": [
+        "string"
+      ],
+      "conf": {
+        "additionalProp1": "string",
+        "additionalProp2": "string",
+        "additionalProp3": "string"
+      },
+      "driverCores": 0,
+      "driverMemory": "string",
+      "executorCores": 0,
+      "executorMemory": "string",
+      "file": "string",
+      "logLevel": "string",
+      "name": "string",
+      "numExecutors": 0,
+      "proxyUser": "string",
+      "pyFiles": [
+        "string"
+      ],
+      "ttl": "string"
+    }
+  },
+  "requestID": "string",
+  "user": "string",
+  "variables": {
+    "additionalProp1": "string",
+    "additionalProp2": "string",
+    "additionalProp3": "string"
+  }
+}'
+```
 
 
 #### Lab 4: Use the API to explore CDE Job Runs, Definitions, and Artifacts

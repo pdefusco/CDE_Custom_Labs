@@ -439,10 +439,22 @@ Explore jobs:
 cde job list --filter 'name[eq]myJob'
 ```
 
+```
+curl -X 'GET' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs?latestjob=false&filter=name%5Beq%5DmyJob&limit=20&offset=0&orderasc=true' \
+  -H 'accept: application/json'
+```
+
 Filter all jobs where job application file equals "code/spark_geospatial.py":
 
 ```
 cde job list --filter 'spark.file[eq]code/myApp.py'
+```
+
+```
+curl -X 'GET' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs?latestjob=false&filter=spark.file%5Beq%5Dcode%2FmyApp.py&limit=20&offset=0&orderasc=true' \
+  -H 'accept: application/json'
 ```
 
 You can use different operators. For example, search all jobs whose name contains "spark":
@@ -451,10 +463,22 @@ You can use different operators. For example, search all jobs whose name contain
 cde job list --filter 'name[rlike]spark'
 ```
 
+```
+curl -X 'GET' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs?latestjob=false&filter=name%5Brlike%5Dspark&limit=20&offset=0&orderasc=true' \
+  -H 'accept: application/json'
+```
+
 Search all jobs created on or after 11/23/23:
 
 ```
 cde job list --filter 'created[gte]2023-11-23'
+```
+
+```
+curl -X 'GET' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs?latestjob=false&filter=created%5Bgte%5D2023-11-23&limit=20&offset=0&orderasc=true' \
+  -H 'accept: application/json'
 ```
 
 Search all jobs with executorCores less than 2:
@@ -463,10 +487,22 @@ Search all jobs with executorCores less than 2:
 cde job list --filter 'spark.executorCores[lt]2'
 ```
 
+```
+curl -X 'GET' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs?latestjob=false&filter=spark.executorCores%5Blt%5D2&limit=20&offset=0&orderasc=true' \
+  -H 'accept: application/json'
+```
+
 List all runs for job "geospatialRdd":
 
 ```
 cde run list --filter 'job[eq]geospatialRdd'
+```
+
+```
+curl -X 'GET' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/job-runs?filter=job%5Beq%5DgeospatialRdd&limit=20&offset=0&orderby=ID&orderasc=true' \
+  -H 'accept: application/json'
 ```
 
 You can combine multiple filters. Return all job runs from today (11/29/23) i.e. where the start date is greater than or equal to 11/29 and the end date is less than or equal to 11/30. Notice all times default to +00 UTC timezone.
@@ -475,10 +511,22 @@ You can combine multiple filters. Return all job runs from today (11/29/23) i.e.
 cde run list --filter 'started[gte]2023-11-29' --filter 'ended[lte]2023-11-30'
 ```
 
-List all successful airflow jobs created by user pauldefusco that started after 3 am UTC on 11/29/23:
+```
+curl -X 'GET' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/job-runs?filter=started%5Bgte%5D2023-11-29%20AND%20ended%5Blte%5D2023-11-30&limit=20&offset=0&orderby=ID&orderasc=true' \
+  -H 'accept: application/json'
+```
+
+List all successful airflow jobs run by user pauldefusco that started after 3 am UTC on 11/29/23:
 
 ```
 cde run list --filter 'type[eq]airflow' --filter 'status[eq]succeeded' --filter 'user[eq]pauldefusco' --filter 'started[gte]2023-11-29T03'
+```
+
+```
+curl -X 'GET' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/job-runs?filter=type%5Beq%5Dairflow%20AND%20status%5Beq%5Dsucceeded%20AND%20user%5Beq%5Dpauldefusco%20AND%20started%5Bgte%5D2023-11-29T03'\''&limit=20&offset=0&orderby=ID&orderasc=true' \
+  -H 'accept: application/json'
 ```
 
 List all CDE Resources will return all types ("python-env", "files", "custom-runtime-image"):
@@ -487,16 +535,34 @@ List all CDE Resources will return all types ("python-env", "files", "custom-run
 cde resource list
 ```
 
+```
+curl -X 'GET' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/resources?includeFiles=false&limit=20&offset=0&orderby=name&orderasc=true' \
+  -H 'accept: application/json'
+```
+
 List all CDE Resources named "myScripts":
 
 ```
 cde resource list --filter 'name[eq]myScripts'
 ```
 
+```
+curl -X 'GET' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/resources?includeFiles=false&filter=name%5Beq%5DmyScripts&limit=20&offset=0&orderby=name&orderasc=true' \
+  -H 'accept: application/json'
+```
+
 List all CDE Resources of type Python Environment:
 
 ```
 cde resource list --filter 'type[eq]python-env'
+```
+
+```
+curl -X 'GET' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/resources?includeFiles=false&filter=type%5Beq%5Dpython-env&limit=20&offset=0&orderby=name&orderasc=true' \
+  -H 'accept: application/json'
 ```
 
 #### Lab 5: Use the API to create a CDE Airflow Pipeline for Iceberg WAP

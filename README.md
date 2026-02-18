@@ -135,7 +135,7 @@ To learn more about CDE Architecture please visit [Creating and Managing Virtual
 
 #### Lab 2: Create your First CDE Spark Job
 
-Using the UI, you will build a CDE Repository, a Files Resource, and CDE Spark Job. Then, you will run the Job and learn about CDE built-in Observability features.
+Using the UI, you will build a CDE Repository and CDE Spark Job. Then, you will run the Job and learn about CDE built-in Observability features.
 
 ```
 cde repository create --name sparkAppRepoDevUser001 \
@@ -145,8 +145,34 @@ cde repository create --name sparkAppRepoDevUser001 \
 ```
 
 ```
+curl -X 'POST' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/repositories' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "git": {
+    "branch": "string",
+    "credential": "string",
+    "currentPath": "string",
+    "insecureSkipTLS": true,
+    "repository": "string",
+    "repositoryTLSCerts": "string",
+    "sizeBytes": 0
+  },
+  "name": "myRepo",
+  "skipCredentialValidation": true
+}'
+```
+
+```
 cde repository sync --name sparkAppRepoDevUser001 \
   --vcluster-endpoint https://tgsn9958.cde-qngfhb5x.pdf-aw-c.a465-9q4k.cloudera.site/dex/api/v1
+```
+
+```
+curl -X 'POST' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/repositories/myRepo' \
+  -H 'accept: application/json'
 ```
 
 ![alt text](img/repos.png)
@@ -168,10 +194,115 @@ cde job create --name cde_spark_iceberg_job_user001 \
 ```
 
 ```
+curl -X 'POST' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "defaultVariables": {
+    "additionalProp1": "string",
+    "additionalProp2": "string",
+    "additionalProp3": "string"
+  },
+  "hidden": true,
+  "mounts": [
+    {
+      "dirPrefix": "string",
+      "resourceName": "string"
+    }
+  ],
+  "name": "string",
+  "pipeline": {
+    "resource": {
+      "name": "string",
+      "path": "string"
+    },
+    "source": "string"
+  },
+  "spark": {
+    "args": [
+      "string"
+    ],
+    "conf": {
+      "additionalProp1": "string",
+      "additionalProp2": "string",
+      "additionalProp3": "string"
+    },
+    "driverCores": 0,
+    "driverMemory": "string",
+    "executorCores": 0,
+    "executorMemory": "string",
+    "file": "string",
+    "logLevel": "string",
+    "name": "string",
+    "numExecutors": 0,
+    "proxyUser": "string",
+    "pythonEnvResourceName": "string"
+  },
+  "type": "string",
+  "workloadCredentials": [
+    "string"
+  ]
+}'
+```
+
+```
 cde job run --name cde_spark_iceberg_job_user001 \
   --executor-cores 2 \
   --executor-memory "2g" \
   --vcluster-endpoint <your-DEV-vc-jobs-api-url-here>
+```
+
+```
+curl -X 'POST' \
+  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs/myJob/run' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "hidden": true,
+  "overrides": {
+    "airflow": {
+      "conf": {
+        "additionalProp1": {}
+      },
+      "config": {
+        "additionalProp1": "string",
+        "additionalProp2": "string",
+        "additionalProp3": "string"
+      }
+    },
+    "spark": {
+      "args": [
+        "string"
+      ],
+      "conf": {
+        "additionalProp1": "string",
+        "additionalProp2": "string",
+        "additionalProp3": "string"
+      },
+      "driverCores": 0,
+      "driverMemory": "string",
+      "executorCores": 0,
+      "executorMemory": "string",
+      "file": "string",
+      "logLevel": "string",
+      "name": "string",
+      "numExecutors": 0,
+      "proxyUser": "string",
+      "pyFiles": [
+        "string"
+      ],
+      "ttl": "string"
+    }
+  },
+  "requestID": "string",
+  "user": "string",
+  "variables": {
+    "additionalProp1": "string",
+    "additionalProp2": "string",
+    "additionalProp3": "string"
+  }
+}'
 ```
 
 ![alt text](img/cde-job-1.png)
@@ -193,6 +324,8 @@ Using the API, run a CDE Spark Submit with the provided Pyspark and Iceberg appl
 ```
 cde spark submit code/spark/icebergApp.py
 ```
+
+
 
 #### Lab 4: Use the API to explore CDE Job Runs, Definitions, and Artifacts
 

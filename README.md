@@ -123,7 +123,7 @@ This view includes other important cluster management information. From here you
 
 Open the Configuration tab. Notice that you can select between Core and All Purpose Tier Clusters.
 In addition, this view provides options to set CPU and Memory autoscale ranges, Spark version, and Iceberg options are set here.
-CDE supports Spark 3.5.1.
+CDE supports Spark 3.3.
 
 ![alt text](img/vc_details_1.png)
 
@@ -145,19 +145,31 @@ cde repository create --name sparkAppRepoDevUser001 \
 ```
 
 ```
-curl -X 'POST' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/repositories' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
+export CDE_JOB_URL="https://9dzt9w5g.cde-s9225lcp.se-sandb.a465-9q4k.cloudera.site/dex/api/v1"
+```
+
+```
+export CDE_TOKEN=$(curl -s -u pauldefusco https://service.cde-s9225lcp.se-sandb.a465-9q4k.cloudera.site/gateway/authtkn/knoxtoken/api/v1/token | jq -r '.access_token')
+```
+
+Test your API setup with a simple request to list jobs:
+
+```
+curl -H "Authorization: Bearer ${CDE_TOKEN}" -X GET "${CDE_JOB_URL}/jobs?latestjob=false&filter=name%5Beq%5DmyJob&limit=20&offset=0&orderasc=true"      
+```
+
+If that returned a succesful response, you're ready to move on to the lab.
+
+Create a CDE Repository:
+
+```
+curl -H "Authorization: Bearer ${CDE_TOKEN}" -X 'POST' "${CDE_JOB_URL}/repositories" \
+  -H "accept: application/json" -H "Content-Type: application/json" \
   -d '{
   "git": {
-    "branch": "string",
-    "credential": "string",
-    "currentPath": "string",
+    "branch": "main",
     "insecureSkipTLS": true,
-    "repository": "string",
-    "repositoryTLSCerts": "string",
-    "sizeBytes": 0
+    "repository": "https://github.com/pdefusco/CDE_Custom_Labs.git"
   },
   "name": "myRepo",
   "skipCredentialValidation": true
@@ -170,9 +182,8 @@ cde repository sync --name sparkAppRepoDevUser001 \
 ```
 
 ```
-curl -X 'POST' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/repositories/myRepo' \
-  -H 'accept: application/json'
+curl -H "Authorization: Bearer ${CDE_TOKEN}" -X 'POST' "${CDE_JOB_URL}/repositories/myRepo" \
+  -H "accept: application/json" -H "Content-Type: application/json"
 ```
 
 ![alt text](img/repos.png)
@@ -194,31 +205,18 @@ cde job create --name cde_spark_iceberg_job_user001 \
 ```
 
 ```
-curl -X 'POST' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'POST' '${CDE_JOB_URL}/jobs' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "defaultVariables": {
-    "additionalProp1": "string",
-    "additionalProp2": "string",
-    "additionalProp3": "string"
-  },
-  "hidden": true,
   "mounts": [
     {
       "dirPrefix": "string",
       "resourceName": "string"
     }
   ],
-  "name": "string",
-  "pipeline": {
-    "resource": {
-      "name": "string",
-      "path": "string"
-    },
-    "source": "string"
-  },
+  "name": "myIcebergJob",
   "spark": {
     "args": [
       "string"
@@ -228,21 +226,18 @@ curl -X 'POST' \
       "additionalProp2": "string",
       "additionalProp3": "string"
     },
-    "driverCores": 0,
+    "driverCores": 1,
     "driverMemory": "string",
-    "executorCores": 0,
-    "executorMemory": "string",
+    "executorCores": 2,
+    "executorMemory": "2g",
     "file": "string",
     "logLevel": "string",
     "name": "string",
-    "numExecutors": 0,
+    "numExecutors": 1,
     "proxyUser": "string",
     "pythonEnvResourceName": "string"
   },
-  "type": "string",
-  "workloadCredentials": [
-    "string"
-  ]
+  "type": "spark",
 }'
 ```
 
@@ -254,23 +249,12 @@ cde job run --name cde_spark_iceberg_job_user001 \
 ```
 
 ```
-curl -X 'POST' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs/myJob/run' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'POST' '${CDE_JOB_URL}/jobs/myJob/run' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "hidden": true,
   "overrides": {
-    "airflow": {
-      "conf": {
-        "additionalProp1": {}
-      },
-      "config": {
-        "additionalProp1": "string",
-        "additionalProp2": "string",
-        "additionalProp3": "string"
-      }
-    },
     "spark": {
       "args": [
         "string"
@@ -280,19 +264,14 @@ curl -X 'POST' \
         "additionalProp2": "string",
         "additionalProp3": "string"
       },
-      "driverCores": 0,
-      "driverMemory": "string",
-      "executorCores": 0,
-      "executorMemory": "string",
+      "driverCores": 1,
+      "driverMemory": "1g",
+      "executorCores": 2,
+      "executorMemory": "2g",
       "file": "string",
       "logLevel": "string",
-      "name": "string",
-      "numExecutors": 0,
-      "proxyUser": "string",
-      "pyFiles": [
-        "string"
-      ],
-      "ttl": "string"
+      "name": "myJob",
+      "numExecutors": 1
     }
   },
   "requestID": "string",
@@ -326,8 +305,8 @@ cde spark submit code/spark/icebergApp.py
 ```
 
 ```
-curl -X 'POST' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'POST' '${CDE_JOB_URL}/jobs' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -343,7 +322,7 @@ curl -X 'POST' \
       "resourceName": "string"
     }
   ],
-  "name": "string",
+  "name": "icebergApp",
   "pipeline": {
     "resource": {
       "name": "string",
@@ -360,42 +339,26 @@ curl -X 'POST' \
       "additionalProp2": "string",
       "additionalProp3": "string"
     },
-    "driverCores": 0,
-    "driverMemory": "string",
-    "executorCores": 0,
-    "executorMemory": "string",
+    "driverCores": 1,
+    "driverMemory": "1g",
+    "executorCores": 2,
+    "executorMemory": "2g",
     "file": "string",
-    "logLevel": "string",
-    "name": "string",
-    "numExecutors": 0,
-    "proxyUser": "string",
-    "pythonEnvResourceName": "string"
+    "name": "icebergApp",
+    "numExecutors": 1
   },
-  "type": "string",
-  "workloadCredentials": [
-    "string"
-  ]
+  "type": "spark"
 }'
 ```
 
 ```
-curl -X 'POST' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs/myJob/run' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'POST' "${CDE_JOB_URL}/jobs/myJob/run" \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
   "hidden": true,
   "overrides": {
-    "airflow": {
-      "conf": {
-        "additionalProp1": {}
-      },
-      "config": {
-        "additionalProp1": "string",
-        "additionalProp2": "string",
-        "additionalProp3": "string"
-      }
-    },
     "spark": {
       "args": [
         "string"
@@ -405,23 +368,15 @@ curl -X 'POST' \
         "additionalProp2": "string",
         "additionalProp3": "string"
       },
-      "driverCores": 0,
-      "driverMemory": "string",
-      "executorCores": 0,
-      "executorMemory": "string",
+      "driverCores": 1,
+      "driverMemory": "1g",
+      "executorCores": 2,
+      "executorMemory": "2g",
       "file": "string",
-      "logLevel": "string",
-      "name": "string",
-      "numExecutors": 0,
-      "proxyUser": "string",
-      "pyFiles": [
-        "string"
-      ],
-      "ttl": "string"
+      "name": "icebergApp",
+      "numExecutors": 1
     }
   },
-  "requestID": "string",
-  "user": "string",
   "variables": {
     "additionalProp1": "string",
     "additionalProp2": "string",
@@ -440,8 +395,9 @@ cde job list --filter 'name[eq]myJob'
 ```
 
 ```
-curl -X 'GET' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs?latestjob=false&filter=name%5Beq%5DmyJob&limit=20&offset=0&orderasc=true' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'GET' \
+  "${CDE_JOB_URL}/jobs?latestjob=false&filter=name%5Beq%5DmyJob&limit=20&offset=0&orderasc=true" \
   -H 'accept: application/json'
 ```
 
@@ -452,8 +408,9 @@ cde job list --filter 'spark.file[eq]code/myApp.py'
 ```
 
 ```
-curl -X 'GET' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs?latestjob=false&filter=spark.file%5Beq%5Dcode%2FmyApp.py&limit=20&offset=0&orderasc=true' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'GET' \
+  "${CDE_JOB_URL}/jobs?latestjob=false&filter=spark.file%5Beq%5Dcode%2FmyApp.py&limit=20&offset=0&orderasc=true" \
   -H 'accept: application/json'
 ```
 
@@ -464,8 +421,9 @@ cde job list --filter 'name[rlike]spark'
 ```
 
 ```
-curl -X 'GET' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs?latestjob=false&filter=name%5Brlike%5Dspark&limit=20&offset=0&orderasc=true' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'GET' \
+  "${CDE_JOB_URL}/jobs?latestjob=false&filter=name%5Brlike%5Dspark&limit=20&offset=0&orderasc=true" \
   -H 'accept: application/json'
 ```
 
@@ -476,8 +434,9 @@ cde job list --filter 'created[gte]2023-11-23'
 ```
 
 ```
-curl -X 'GET' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs?latestjob=false&filter=created%5Bgte%5D2023-11-23&limit=20&offset=0&orderasc=true' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'GET' \
+  '${CDE_JOB_URL}/jobs?latestjob=false&filter=created%5Bgte%5D2023-11-23&limit=20&offset=0&orderasc=true' \
   -H 'accept: application/json'
 ```
 
@@ -488,8 +447,9 @@ cde job list --filter 'spark.executorCores[lt]2'
 ```
 
 ```
-curl -X 'GET' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs?latestjob=false&filter=spark.executorCores%5Blt%5D2&limit=20&offset=0&orderasc=true' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'GET' \
+  '${CDE_JOB_URL}/jobs?latestjob=false&filter=spark.executorCores%5Blt%5D2&limit=20&offset=0&orderasc=true' \
   -H 'accept: application/json'
 ```
 
@@ -500,8 +460,9 @@ cde run list --filter 'job[eq]geospatialRdd'
 ```
 
 ```
-curl -X 'GET' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/job-runs?filter=job%5Beq%5DgeospatialRdd&limit=20&offset=0&orderby=ID&orderasc=true' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'GET' \
+  '${CDE_JOB_URL}/job-runs?filter=job%5Beq%5DgeospatialRdd&limit=20&offset=0&orderby=ID&orderasc=true' \
   -H 'accept: application/json'
 ```
 
@@ -512,8 +473,9 @@ cde run list --filter 'started[gte]2023-11-29' --filter 'ended[lte]2023-11-30'
 ```
 
 ```
-curl -X 'GET' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/job-runs?filter=started%5Bgte%5D2023-11-29%20AND%20ended%5Blte%5D2023-11-30&limit=20&offset=0&orderby=ID&orderasc=true' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'GET' \
+  '${CDE_JOB_URL}/job-runs?filter=started%5Bgte%5D2023-11-29%20AND%20ended%5Blte%5D2023-11-30&limit=20&offset=0&orderby=ID&orderasc=true' \
   -H 'accept: application/json'
 ```
 
@@ -524,8 +486,9 @@ cde run list --filter 'type[eq]airflow' --filter 'status[eq]succeeded' --filter 
 ```
 
 ```
-curl -X 'GET' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/job-runs?filter=type%5Beq%5Dairflow%20AND%20status%5Beq%5Dsucceeded%20AND%20user%5Beq%5Dpauldefusco%20AND%20started%5Bgte%5D2023-11-29T03'\''&limit=20&offset=0&orderby=ID&orderasc=true' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'GET' \
+  '${CDE_JOB_URL}/job-runs?filter=type%5Beq%5Dairflow%20AND%20status%5Beq%5Dsucceeded%20AND%20user%5Beq%5Dpauldefusco%20AND%20started%5Bgte%5D2023-11-29T03'\''&limit=20&offset=0&orderby=ID&orderasc=true' \
   -H 'accept: application/json'
 ```
 
@@ -536,8 +499,9 @@ cde resource list
 ```
 
 ```
-curl -X 'GET' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/resources?includeFiles=false&limit=20&offset=0&orderby=name&orderasc=true' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'GET' \
+  '${CDE_JOB_URL}/resources?includeFiles=false&limit=20&offset=0&orderby=name&orderasc=true' \
   -H 'accept: application/json'
 ```
 
@@ -548,8 +512,9 @@ cde resource list --filter 'name[eq]myScripts'
 ```
 
 ```
-curl -X 'GET' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/resources?includeFiles=false&filter=name%5Beq%5DmyScripts&limit=20&offset=0&orderby=name&orderasc=true' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'GET' \
+  '${CDE_JOB_URL}/resources?includeFiles=false&filter=name%5Beq%5DmyScripts&limit=20&offset=0&orderby=name&orderasc=true' \
   -H 'accept: application/json'
 ```
 
@@ -560,8 +525,9 @@ cde resource list --filter 'type[eq]python-env'
 ```
 
 ```
-curl -X 'GET' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/resources?includeFiles=false&filter=type%5Beq%5Dpython-env&limit=20&offset=0&orderby=name&orderasc=true' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'GET' \
+  '${CDE_JOB_URL}/resources?includeFiles=false&filter=type%5Beq%5Dpython-env&limit=20&offset=0&orderby=name&orderasc=true' \
   -H 'accept: application/json'
 ```
 
@@ -648,8 +614,9 @@ cde job create --name cde_spark_job_gold_user001 \
 ```
 
 ```
-curl -X 'POST' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'POST' \
+  '${CDE_JOB_URL}/jobs' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -666,13 +633,6 @@ curl -X 'POST' \
     }
   ],
   "name": "cde_spark_job_bronze_user001",
-  "pipeline": {
-    "resource": {
-      "name": "string",
-      "path": "string"
-    },
-    "source": "string"
-  },
   "spark": {
     "args": [
       "string"
@@ -682,27 +642,24 @@ curl -X 'POST' \
       "additionalProp2": "string",
       "additionalProp3": "string"
     },
-    "driverCores": 0,
-    "driverMemory": "string",
-    "executorCores": 0,
-    "executorMemory": "string",
+    "driverCores": 1,
+    "driverMemory": "1g",
+    "executorCores": 2,
+    "executorMemory": "2g",
     "file": "string",
-    "logLevel": "string",
     "name": "string",
-    "numExecutors": 0,
+    "numExecutors": 1,
     "proxyUser": "string",
     "pythonEnvResourceName": "string"
   },
-  "type": "string",
-  "workloadCredentials": [
-    "string"
-  ]
+  "type": "spark"
 }'
 ```
 
 ```
-curl -X 'POST' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'POST' \
+  '${CDE_JOB_URL}/jobs' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -719,13 +676,6 @@ curl -X 'POST' \
     }
   ],
   "name": "cde_spark_job_silver_user001",
-  "pipeline": {
-    "resource": {
-      "name": "string",
-      "path": "string"
-    },
-    "source": "string"
-  },
   "spark": {
     "args": [
       "string"
@@ -735,27 +685,25 @@ curl -X 'POST' \
       "additionalProp2": "string",
       "additionalProp3": "string"
     },
-    "driverCores": 0,
-    "driverMemory": "string",
-    "executorCores": 0,
-    "executorMemory": "string",
+    "driverCores": 1,
+    "driverMemory": "1g",
+    "executorCores": 2,
+    "executorMemory": "2g",
     "file": "string",
     "logLevel": "string",
     "name": "string",
-    "numExecutors": 0,
+    "numExecutors": 1,
     "proxyUser": "string",
     "pythonEnvResourceName": "string"
   },
-  "type": "string",
-  "workloadCredentials": [
-    "string"
-  ]
+  "type": "spark"
 }'
 ```
 
 ```
-curl -X 'POST' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'POST' \
+  '${CDE_JOB_URL}/jobs' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -772,13 +720,6 @@ curl -X 'POST' \
     }
   ],
   "name": "cde_spark_job_gold_user001",
-  "pipeline": {
-    "resource": {
-      "name": "string",
-      "path": "string"
-    },
-    "source": "string"
-  },
   "spark": {
     "args": [
       "string"
@@ -788,24 +729,20 @@ curl -X 'POST' \
       "additionalProp2": "string",
       "additionalProp3": "string"
     },
-    "driverCores": 0,
-    "driverMemory": "string",
-    "executorCores": 0,
-    "executorMemory": "string",
+    "driverCores": 1,
+    "driverMemory": "1g",
+    "executorCores": 2,
+    "executorMemory": "2g",
     "file": "string",
     "logLevel": "string",
     "name": "string",
-    "numExecutors": 0,
+    "numExecutors": 1,
     "proxyUser": "string",
     "pythonEnvResourceName": "string"
   },
-  "type": "string",
-  "workloadCredentials": [
-    "string"
-  ]
+  "type": "string"
 }'
 ```
-
 
 In your editor, open the Airflow DAG "004_airflow_dag_git" and edit your username variable at line 54.
 
@@ -832,8 +769,9 @@ cde job create --name airflow-orchestration-user001 \
 ```
 
 ```
-curl -X 'POST' \
-  'https://t5c86ppm.cde-s9xvdpkr.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/jobs' \
+curl -H "Authorization: Bearer ${CDE_TOKEN}" \
+  -X 'POST' \
+  '${CDE_JOB_URL}/jobs' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -861,17 +799,8 @@ curl -X 'POST' \
     }
   ],
   "name": "string",
-  "pipeline": {
-    "resource": {
-      "name": "string",
-      "path": "string"
-    },
-    "source": "string"
-  },
   "schedule": {
     "catchup": true,
-    "cronExpression": "string",
-    "dependsOnPast": true,
     "enabled": true,
     "end": "string",
     "nextExecution": "string",

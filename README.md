@@ -145,45 +145,8 @@ cde repository create --name sparkAppRepoDevUser001 \
 ```
 
 ```
-export CDE_JOB_URL="https://9dzt9w5g.cde-s9225lcp.se-sandb.a465-9q4k.cloudera.site/dex/api/v1"
-```
-
-```
-export CDE_TOKEN=$(curl -s -u pauldefusco https://service.cde-s9225lcp.se-sandb.a465-9q4k.cloudera.site/gateway/authtkn/knoxtoken/api/v1/token | jq -r '.access_token')
-```
-
-Test your API setup with a simple request to list jobs:
-
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" -X GET "${CDE_JOB_URL}/jobs?latestjob=false&filter=name%5Beq%5DmyJob&limit=20&offset=0&orderasc=true"      
-```
-
-If that returned a succesful response, you're ready to move on to the lab.
-
-Create a CDE Repository:
-
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" -X 'POST' "${CDE_JOB_URL}/repositories" \
-  -H "accept: application/json" -H "Content-Type: application/json" \
-  -d '{
-  "git": {
-    "branch": "main",
-    "insecureSkipTLS": true,
-    "repository": "https://github.com/pdefusco/CDE_Custom_Labs.git"
-  },
-  "name": "myRepo",
-  "skipCredentialValidation": true
-}'
-```
-
-```
 cde repository sync --name sparkAppRepoDevUser001 \
   --vcluster-endpoint https://tgsn9958.cde-qngfhb5x.pdf-aw-c.a465-9q4k.cloudera.site/dex/api/v1
-```
-
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" -X 'POST' "${CDE_JOB_URL}/repositories/myRepo" \
-  -H "accept: application/json" -H "Content-Type: application/json"
 ```
 
 ![alt text](img/repos.png)
@@ -193,7 +156,7 @@ curl -H "Authorization: Bearer ${CDE_TOKEN}" -X 'POST' "${CDE_JOB_URL}/repositor
 ![alt text](img/cde-repos-2.png)
 
 ```
-cde job create --name cde_spark_iceberg_job_user001 \
+cde job create --name cde_spark_job_user001 \
   --type spark \
   --mount-1-resource sparkAppRepoDevUser001 \
   --executor-cores 2 \
@@ -205,84 +168,12 @@ cde job create --name cde_spark_iceberg_job_user001 \
 ```
 
 ```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'POST' '${CDE_JOB_URL}/jobs' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "mounts": [
-    {
-      "dirPrefix": "string",
-      "resourceName": "string"
-    }
-  ],
-  "name": "myIcebergJob",
-  "spark": {
-    "args": [
-      "string"
-    ],
-    "conf": {
-      "additionalProp1": "string",
-      "additionalProp2": "string",
-      "additionalProp3": "string"
-    },
-    "driverCores": 1,
-    "driverMemory": "string",
-    "executorCores": 2,
-    "executorMemory": "2g",
-    "file": "string",
-    "logLevel": "string",
-    "name": "string",
-    "numExecutors": 1,
-    "proxyUser": "string",
-    "pythonEnvResourceName": "string"
-  },
-  "type": "spark",
-}'
-```
-
-```
-cde job run --name cde_spark_iceberg_job_user001 \
+cde job run --name cde_spark_ob_user001 \
   --executor-cores 2 \
   --executor-memory "2g" \
   --vcluster-endpoint <your-DEV-vc-jobs-api-url-here>
 ```
 
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'POST' '${CDE_JOB_URL}/jobs/myJob/run' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "overrides": {
-    "spark": {
-      "args": [
-        "string"
-      ],
-      "conf": {
-        "additionalProp1": "string",
-        "additionalProp2": "string",
-        "additionalProp3": "string"
-      },
-      "driverCores": 1,
-      "driverMemory": "1g",
-      "executorCores": 2,
-      "executorMemory": "2g",
-      "file": "string",
-      "logLevel": "string",
-      "name": "myJob",
-      "numExecutors": 1
-    }
-  },
-  "requestID": "string",
-  "user": "string",
-  "variables": {
-    "additionalProp1": "string",
-    "additionalProp2": "string",
-    "additionalProp3": "string"
-  }
-}'
-```
 
 ![alt text](img/cde-job-1.png)
 
@@ -304,88 +195,6 @@ Using the API, run a CDE Spark Submit with the provided Pyspark and Iceberg appl
 cde spark submit code/spark/icebergApp.py
 ```
 
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'POST' '${CDE_JOB_URL}/jobs' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "defaultVariables": {
-    "additionalProp1": "string",
-    "additionalProp2": "string",
-    "additionalProp3": "string"
-  },
-  "hidden": true,
-  "mounts": [
-    {
-      "dirPrefix": "string",
-      "resourceName": "string"
-    }
-  ],
-  "name": "icebergApp",
-  "pipeline": {
-    "resource": {
-      "name": "string",
-      "path": "string"
-    },
-    "source": "string"
-  },
-  "spark": {
-    "args": [
-      "string"
-    ],
-    "conf": {
-      "additionalProp1": "string",
-      "additionalProp2": "string",
-      "additionalProp3": "string"
-    },
-    "driverCores": 1,
-    "driverMemory": "1g",
-    "executorCores": 2,
-    "executorMemory": "2g",
-    "file": "string",
-    "name": "icebergApp",
-    "numExecutors": 1
-  },
-  "type": "spark"
-}'
-```
-
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'POST' "${CDE_JOB_URL}/jobs/myJob/run" \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "hidden": true,
-  "overrides": {
-    "spark": {
-      "args": [
-        "string"
-      ],
-      "conf": {
-        "additionalProp1": "string",
-        "additionalProp2": "string",
-        "additionalProp3": "string"
-      },
-      "driverCores": 1,
-      "driverMemory": "1g",
-      "executorCores": 2,
-      "executorMemory": "2g",
-      "file": "string",
-      "name": "icebergApp",
-      "numExecutors": 1
-    }
-  },
-  "variables": {
-    "additionalProp1": "string",
-    "additionalProp2": "string",
-    "additionalProp3": "string"
-  }
-}'
-```
-
-
 #### Lab 4: Use the API to explore CDE Job Runs, Definitions, and Artifacts
 
 Explore jobs:
@@ -394,24 +203,10 @@ Explore jobs:
 cde job list --filter 'name[eq]myJob'
 ```
 
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'GET' \
-  "${CDE_JOB_URL}/jobs?latestjob=false&filter=name%5Beq%5DmyJob&limit=20&offset=0&orderasc=true" \
-  -H 'accept: application/json'
-```
-
 Filter all jobs where job application file equals "code/spark_geospatial.py":
 
 ```
 cde job list --filter 'spark.file[eq]code/myApp.py'
-```
-
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'GET' \
-  "${CDE_JOB_URL}/jobs?latestjob=false&filter=spark.file%5Beq%5Dcode%2FmyApp.py&limit=20&offset=0&orderasc=true" \
-  -H 'accept: application/json'
 ```
 
 You can use different operators. For example, search all jobs whose name contains "spark":
@@ -420,24 +215,10 @@ You can use different operators. For example, search all jobs whose name contain
 cde job list --filter 'name[rlike]spark'
 ```
 
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'GET' \
-  "${CDE_JOB_URL}/jobs?latestjob=false&filter=name%5Brlike%5Dspark&limit=20&offset=0&orderasc=true" \
-  -H 'accept: application/json'
-```
-
 Search all jobs created on or after 11/23/23:
 
 ```
 cde job list --filter 'created[gte]2023-11-23'
-```
-
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'GET' \
-  '${CDE_JOB_URL}/jobs?latestjob=false&filter=created%5Bgte%5D2023-11-23&limit=20&offset=0&orderasc=true' \
-  -H 'accept: application/json'
 ```
 
 Search all jobs with executorCores less than 2:
@@ -446,24 +227,10 @@ Search all jobs with executorCores less than 2:
 cde job list --filter 'spark.executorCores[lt]2'
 ```
 
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'GET' \
-  '${CDE_JOB_URL}/jobs?latestjob=false&filter=spark.executorCores%5Blt%5D2&limit=20&offset=0&orderasc=true' \
-  -H 'accept: application/json'
-```
-
 List all runs for job "geospatialRdd":
 
 ```
 cde run list --filter 'job[eq]geospatialRdd'
-```
-
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'GET' \
-  '${CDE_JOB_URL}/job-runs?filter=job%5Beq%5DgeospatialRdd&limit=20&offset=0&orderby=ID&orderasc=true' \
-  -H 'accept: application/json'
 ```
 
 You can combine multiple filters. Return all job runs from today (11/29/23) i.e. where the start date is greater than or equal to 11/29 and the end date is less than or equal to 11/30. Notice all times default to +00 UTC timezone.
@@ -472,24 +239,10 @@ You can combine multiple filters. Return all job runs from today (11/29/23) i.e.
 cde run list --filter 'started[gte]2023-11-29' --filter 'ended[lte]2023-11-30'
 ```
 
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'GET' \
-  '${CDE_JOB_URL}/job-runs?filter=started%5Bgte%5D2023-11-29%20AND%20ended%5Blte%5D2023-11-30&limit=20&offset=0&orderby=ID&orderasc=true' \
-  -H 'accept: application/json'
-```
-
 List all successful airflow jobs run by user pauldefusco that started after 3 am UTC on 11/29/23:
 
 ```
 cde run list --filter 'type[eq]airflow' --filter 'status[eq]succeeded' --filter 'user[eq]pauldefusco' --filter 'started[gte]2023-11-29T03'
-```
-
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'GET' \
-  '${CDE_JOB_URL}/job-runs?filter=type%5Beq%5Dairflow%20AND%20status%5Beq%5Dsucceeded%20AND%20user%5Beq%5Dpauldefusco%20AND%20started%5Bgte%5D2023-11-29T03'\''&limit=20&offset=0&orderby=ID&orderasc=true' \
-  -H 'accept: application/json'
 ```
 
 List all CDE Resources will return all types ("python-env", "files", "custom-runtime-image"):
@@ -498,37 +251,16 @@ List all CDE Resources will return all types ("python-env", "files", "custom-run
 cde resource list
 ```
 
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'GET' \
-  '${CDE_JOB_URL}/resources?includeFiles=false&limit=20&offset=0&orderby=name&orderasc=true' \
-  -H 'accept: application/json'
-```
-
 List all CDE Resources named "myScripts":
 
 ```
 cde resource list --filter 'name[eq]myScripts'
 ```
 
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'GET' \
-  '${CDE_JOB_URL}/resources?includeFiles=false&filter=name%5Beq%5DmyScripts&limit=20&offset=0&orderby=name&orderasc=true' \
-  -H 'accept: application/json'
-```
-
 List all CDE Resources of type Python Environment:
 
 ```
 cde resource list --filter 'type[eq]python-env'
-```
-
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'GET' \
-  '${CDE_JOB_URL}/resources?includeFiles=false&filter=type%5Beq%5Dpython-env&limit=20&offset=0&orderby=name&orderasc=true' \
-  -H 'accept: application/json'
 ```
 
 #### Lab 5: Use the API to create a CDE Airflow Pipeline for Iceberg WAP
@@ -560,23 +292,10 @@ cde job create --name cde_spark_job_silver_user001 \
   --vcluster-endpoint <your-PRD-vc-jobs-api-url-here>
 ```
 
-```
-cde job create --name cde_spark_job_gold_user001 \
-  --type spark \
-  --arg <your-hol-username-here> \
-  --arg <your-storage-location-here> \
-  --mount-1-resource sparkAppRepoPrdUser001 \
-  --python-env-resource-name Python-Env-Shared \
-  --executor-cores 2 \
-  --executor-memory "4g" \
-  --application-file de-pipeline/spark/003_Lakehouse_Gold.py\
-  --vcluster-endpoint <your-PRD-vc-jobs-api-url-here>
-```
-
 For example:
 
 ```
-cde job create --name cde_spark_job_bronze_user001 \
+cde job create --name cde_spark_job_a_user001 \
   --type spark \
   --arg user001 \
   --arg s3a://pdf-aw-buk-aec7c095/data/cde-demo/bank/20251210 \
@@ -584,164 +303,20 @@ cde job create --name cde_spark_job_bronze_user001 \
   --python-env-resource-name Python-Env-Shared \
   --executor-cores 2 \
   --executor-memory "4g" \
-  --application-file de-pipeline-bank/spark/001_Lakehouse_Bronze.py\
+  --application-file code/spark/001_Lakehouse_Job.py\
   --vcluster-endpoint https://8wcx5dqp.cde-qngfhb5x.pdf-aw-c.a465-9q4k.cloudera.site/dex/api/v1
 ```
 
 ```
-cde job create --name cde_spark_job_silver_user001 \
+cde job create --name cde_spark_job_b_user001 \
   --type spark \
   --arg user001 \
   --mount-1-resource sparkAppRepoPrdUser001 \
   --python-env-resource-name Python-Env-Shared \
   --executor-cores 2 \
   --executor-memory "4g" \
-  --application-file de-pipeline-bank/spark/002_Lakehouse_Silver.py\
+  --application-file de-pipeline-bank/spark/002_Lakehouse_Job.py\
   --vcluster-endpoint https://8wcx5dqp.cde-qngfhb5x.pdf-aw-c.a465-9q4k.cloudera.site/dex/api/v1
-```
-
-```
-cde job create --name cde_spark_job_gold_user001 \
-  --type spark \
-  --arg user001 \
-  --arg s3a://pdf-aw-buk-aec7c095/data/cde-demo/bank/20251210 \
-  --mount-1-resource sparkAppRepoPrdUser001 \
-  --python-env-resource-name Python-Env-Shared \
-  --executor-cores 2 \
-  --executor-memory "4g" \
-  --application-file de-pipeline-bank/spark/003_Lakehouse_Gold.py\
-  --vcluster-endpoint https://8wcx5dqp.cde-qngfhb5x.pdf-aw-c.a465-9q4k.cloudera.site/dex/api/v1
-```
-
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'POST' \
-  '${CDE_JOB_URL}/jobs' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "defaultVariables": {
-    "additionalProp1": "string",
-    "additionalProp2": "string",
-    "additionalProp3": "string"
-  },
-  "hidden": true,
-  "mounts": [
-    {
-      "dirPrefix": "string",
-      "resourceName": "string"
-    }
-  ],
-  "name": "cde_spark_job_bronze_user001",
-  "spark": {
-    "args": [
-      "string"
-    ],
-    "conf": {
-      "additionalProp1": "string",
-      "additionalProp2": "string",
-      "additionalProp3": "string"
-    },
-    "driverCores": 1,
-    "driverMemory": "1g",
-    "executorCores": 2,
-    "executorMemory": "2g",
-    "file": "string",
-    "name": "string",
-    "numExecutors": 1,
-    "proxyUser": "string",
-    "pythonEnvResourceName": "string"
-  },
-  "type": "spark"
-}'
-```
-
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'POST' \
-  '${CDE_JOB_URL}/jobs' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "defaultVariables": {
-    "additionalProp1": "string",
-    "additionalProp2": "string",
-    "additionalProp3": "string"
-  },
-  "hidden": true,
-  "mounts": [
-    {
-      "dirPrefix": "string",
-      "resourceName": "string"
-    }
-  ],
-  "name": "cde_spark_job_silver_user001",
-  "spark": {
-    "args": [
-      "string"
-    ],
-    "conf": {
-      "additionalProp1": "string",
-      "additionalProp2": "string",
-      "additionalProp3": "string"
-    },
-    "driverCores": 1,
-    "driverMemory": "1g",
-    "executorCores": 2,
-    "executorMemory": "2g",
-    "file": "string",
-    "logLevel": "string",
-    "name": "string",
-    "numExecutors": 1,
-    "proxyUser": "string",
-    "pythonEnvResourceName": "string"
-  },
-  "type": "spark"
-}'
-```
-
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'POST' \
-  '${CDE_JOB_URL}/jobs' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "defaultVariables": {
-    "additionalProp1": "string",
-    "additionalProp2": "string",
-    "additionalProp3": "string"
-  },
-  "hidden": true,
-  "mounts": [
-    {
-      "dirPrefix": "string",
-      "resourceName": "string"
-    }
-  ],
-  "name": "cde_spark_job_gold_user001",
-  "spark": {
-    "args": [
-      "string"
-    ],
-    "conf": {
-      "additionalProp1": "string",
-      "additionalProp2": "string",
-      "additionalProp3": "string"
-    },
-    "driverCores": 1,
-    "driverMemory": "1g",
-    "executorCores": 2,
-    "executorMemory": "2g",
-    "file": "string",
-    "logLevel": "string",
-    "name": "string",
-    "numExecutors": 1,
-    "proxyUser": "string",
-    "pythonEnvResourceName": "string"
-  },
-  "type": "string"
-}'
 ```
 
 In your editor, open the Airflow DAG "004_airflow_dag_git" and edit your username variable at line 54.
@@ -754,7 +329,7 @@ Then create the CDE Airflow job. This job will orchestrate your Lakehouse Spark 
 cde job create --name airflow-orchestration-user001 \
   --type airflow \
   --mount-1-resource sparkAppRepoPrdUser001 \
-  --dag-file de-pipeline/airflow/004_airflow_dag_git.py\
+  --dag-file code/airflow/003_airflow_dag.py\
   --vcluster-endpoint <your-PRD-vc-jobs-api-url-here>
 ```
 
@@ -764,53 +339,8 @@ For example:
 cde job create --name airflow-orchestration-user001 \
   --type airflow \
   --mount-1-resource sparkAppRepoPrdUser001 \
-  --dag-file de-pipeline-bank/airflow/004_airflow_dag_git.py\
+  --dag-file code/airflow/003_airflow_dag.py\
   --vcluster-endpoint https://8wcx5dqp.cde-qngfhb5x.pdf-aw-c.a465-9q4k.cloudera.site/dex/api/v1
-```
-
-```
-curl -H "Authorization: Bearer ${CDE_TOKEN}" \
-  -X 'POST' \
-  '${CDE_JOB_URL}/jobs' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "airflow": {
-    "conf": {
-      "additionalProp1": {}
-    },
-    "config": {
-      "additionalProp1": "string",
-      "additionalProp2": "string",
-      "additionalProp3": "string"
-    },
-    "dagFile": "string",
-    "fileMounts": [
-      {
-        "dirPrefix": "string",
-        "resourceName": "string"
-      }
-    ]
-  },
-  "mounts": [
-    {
-      "dirPrefix": "string",
-      "resourceName": "string"
-    }
-  ],
-  "name": "string",
-  "schedule": {
-    "catchup": true,
-    "enabled": true,
-    "end": "string",
-    "nextExecution": "string",
-    "paused": true,
-    "pausedUponCreation": true,
-    "start": "string",
-    "user": "string"
-  },
-  "type": "string",
-}'
 ```
 
 ![alt text](img/jobs-cde.png)

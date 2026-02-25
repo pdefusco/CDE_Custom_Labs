@@ -49,10 +49,15 @@ from airflow.operators.bash import BashOperator
 from airflow.providers.github.operators.github import GithubOperator
 import pendulum
 import logging
+import secrets
+import string
 
+
+UUID = ''.join(secrets.choice(string.ascii_lowercase) for _ in range(7))
+print(f"Assigned Dag ID: {UUID}")
 
 username = "user001" # Enter your username here
-dag_name = "BankFraudHol-"+username
+dag_name = "BankFraudHol-"+UUID
 logger = logging.getLogger(__name__)
 
 print("Using DAG Name: {}".format(dag_name))
@@ -76,38 +81,23 @@ start = DummyOperator(
         dag=dag
 )
 
-bronze = CDEJobRunOperator(
+spark_job_a = CDEJobRunOperator(
         task_id='data-ingestion',
         dag=dag,
-        job_name='cde_spark_job_bronze_' + username, #Must match name of CDE Spark Job in the CDE Jobs UI
+        job_name='cde_spark_job_a_' + username, #Must match name of CDE Spark Job in the CDE Jobs UI
         trigger_rule='all_success',
         )
 
-silver = CDEJobRunOperator(
-        task_id='iceberg-merge-branch',
+spark_job_b = CDEJobRunOperator(
+        task_id='ETL',
         dag=dag,
-        job_name='cde_spark_job_silver_' + username, #Must match name of CDE Spark Job in the CDE Jobs UI
+        job_name='cde_spark_b_' + username, #Must match name of CDE Spark Job in the CDE Jobs UI
         trigger_rule='all_success',
         )
-
-gold = CDEJobRunOperator(
-        task_id='gold-layer',
-        dag=dag,
-        job_name='cde_spark_job_gold_' + username, #Must match name of CDE Spark Job in the CDE Jobs UI
-        trigger_rule='all_success',
-        )
-
-github_list_repos = GithubOperator(
-    task_id="github_list_repos",
-    github_method="get_user",
-    github_conn_id="default_github",
-    result_processor=lambda user: logger.info(list(user.get_repos())),
-    dag=dag
-)
 
 end = DummyOperator(
         task_id="end",
         dag=dag
 )
 
-start >> bronze >> silver >> gold >> github_list_repos >> end
+start >> spark_job_a >> spark_job_b >> end

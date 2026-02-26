@@ -133,7 +133,40 @@ CDE supports Spark 3.3.
 
 To learn more about CDE Architecture please visit [Creating and Managing Virtual Clusters](https://docs.cloudera.com/data-engineering/cloud/manage-clusters/topics/cde-create-cluster.html) and [Recommendations for Scaling CDE Deployments](https://docs.cloudera.com/data-engineering/cloud/deployment-architecture/topics/cde-general-scaling.html)
 
-#### Lab 2: Create your First CDE Spark Job
+#### Lab 2: User Setup
+
+Navigate to the CDP Management Console and create new CDP Credentials for your user as shown below.
+
+Open CDE's configurations and apply your Workload Username and Jobs API URL. You can find your Jobs API URL in your Virtual Cluster's Details Page.
+
+![alt text](img/jobs-api-url-1.png)
+
+![alt text](img/jobs-api-url-2.png)
+
+![alt text](img/cli-configs-1.png)
+
+![alt text](img/cli-configs-2.png)
+
+Next, generate a CDP access token and edit your CDP credentials.
+
+![alt text](img/usr-mgt-1.png)
+
+![alt text](img/usr-mgt-2.png)
+
+![alt text](img/usr-mgt-3.png)
+
+![alt text](img/cdp-credentials.png)
+
+
+#### Lab 3: Create your First CDE Spark Submit
+
+Using the API, run a CDE Spark Submit with the provided Pyspark and Iceberg application. Navigate to the CDE UI and look at the standard output.
+
+```
+cde spark submit code/spark/icebergApp.py
+```
+
+#### Lab 4: Create your First CDE Spark Job
 
 Using the UI, you will build a CDE Repository and CDE Spark Job. Then, you will run the Job and learn about CDE built-in Observability features.
 
@@ -187,15 +220,48 @@ cde job run --name cde_spark_ob_user001 \
 
 ![alt text](img/cde-job-6.png)
 
-#### Lab 3: Create your First CDE Spark and Iceberg Job
+#### Lab 5: Use CDE ACL's
 
-Using the API, run a CDE Spark Submit with the provided Pyspark and Iceberg application. Navigate to the CDE UI and look at the standard output.
+Create a CDE Files Resource with ACL
 
 ```
-cde spark submit code/spark/icebergApp.py
+cde resource create \
+  --name filesResource \
+  --type files \
+  --acl-full-access-group group1 \            
+  --acl-full-access-user user1 \    
+  --acl-view-only-group group2 \               
+  --acl-view-only-user user2
 ```
 
-#### Lab 4: Use the API to explore CDE Job Runs, Definitions, and Artifacts
+```
+cde resource upload \
+  --name myProperties \
+  --local-path cde_jobs/propertiesFile_1.conf \
+  --local-path cde_jobs/propertiesFile_2.conf \
+  --local-path cde_jobs/sparkJob.py
+```
+
+Create a CDE Job with ACL
+
+```
+cde job create \
+  --name sampleJob \
+  --type spark \
+  --mount-1-resource myProperties \
+  --application-file sparkJob.py \
+  --executor-cores 2 \
+  --executor-memory "2g"
+```
+
+```
+cde job run --name myPySparkJob\
+--arg MY_DB\
+--arg CUSTOMER_TABLE\
+--arg propertiesFile_1.conf
+```
+
+#### Lab 6: Use the CLI to explore CDE Job Runs, Definitions, and Artifacts
 
 Explore jobs:
 
@@ -263,7 +329,7 @@ List all CDE Resources of type Python Environment:
 cde resource list --filter 'type[eq]python-env'
 ```
 
-#### Lab 5: Use the API to create a CDE Airflow Pipeline for Iceberg WAP
+#### Lab 7: Use the CLI to create a CDE Airflow Pipeline
 
 Create the CDE Spark jobs. Notice these are categorized into Bronze, Silver and Gold following a Lakehouse Data Architecture.
 

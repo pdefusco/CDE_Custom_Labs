@@ -417,22 +417,6 @@ Airflow provides a variety of diagrams, charts, and visuals to monitor your exec
 
 CDE Airflow supports 3rd party providers i.e. external packages that extend Apache Airflow’s functionality by adding integrations with other systems, services, and tools such as AWS, Google Cloud, Microsoft Azure, databases, message brokers, and many other services. Providers are open sourced and can be installed separately based on the specific needs of a project.
 
-Select the GitHub List Repos Task, open the logs and notice the output is provided. In this particular task you used the GitHub Operator to list repositories from a GitHub account.
-
-![alt text](img/airflow-github-list-repos.png)
-
-An Airflow Connection was created ahead of time to connect to this account via GitHub token. Open the Connections page to explore more connections.
-
-![alt text](img/airflow-connections.png)
-
-![alt text](img/airflow-connections-2.png)
-
-![alt text](img/airflow-connections-3.png)
-
-The GitHub Operator was installed in the Virtual Cluster's Airflow Python environment. Navigate back to the Virtual Cluster Details page, open the Airflow tab and validate the installed packages.
-
-![alt text](img/airflow-installed-packages.png)
-
 
 ### Summary & Next Steps
 

@@ -218,11 +218,13 @@ Set the Jobs API Url variable to a value provided by your admin.
 ```
 cde repository create --name sparkAppRepoDevUser001 \
   --branch main \
-  --url https://github.com/pdefusco/CDE_Custom_Labs.git
+  --url https://github.com/pdefusco/CDE_Custom_Labs.git \
+  --acl-full-access-user "your-user-here"
 ```
 
 ```
-cde repository sync --name sparkAppRepoDevUser001
+cde repository sync \
+  --name sparkAppRepoDevUser001
 ```
 
 ![alt text](img/repos.png)
@@ -239,7 +241,8 @@ cde job create --name cde_spark_job_user001 \
   --executor-memory "2g" \
   --application-file pyspark-app.py\
   --arg <your-storage-location-here> \
-  --arg <your-hol-username-here>
+  --arg <your-hol-username-here> \
+  --acl-full-access-user "your-user-here"
 ```
 
 ```
@@ -266,37 +269,43 @@ cde job run --name cde_spark_ob_user001 \
 Explore jobs:
 
 ```
-cde job list --filter 'name[eq]myJob'
+cde job list \
+  --filter 'name[eq]myJob'
 ```
 
 Filter all jobs where job application file equals "code/spark_geospatial.py":
 
 ```
-cde job list --filter 'spark.file[eq]code/myApp.py'
+cde job list \
+  --filter 'spark.file[eq]code/myApp.py'
 ```
 
 You can use different operators. For example, search all jobs whose name contains "spark":
 
 ```
-cde job list --filter 'name[rlike]spark'
+cde job list \
+  --filter 'name[rlike]spark'
 ```
 
 Search all jobs created on or after 11/23/23:
 
 ```
-cde job list --filter 'created[gte]2023-11-23'
+cde job list \
+  --filter 'created[gte]2023-11-23'
 ```
 
 Search all jobs with executorCores less than 2:
 
 ```
-cde job list --filter 'spark.executorCores[lt]2'
+cde job list \
+  --filter 'spark.executorCores[lt]2'
 ```
 
 List all runs for job "geospatialRdd":
 
 ```
-cde run list --filter 'job[eq]geospatialRdd'
+cde run list \
+  --filter 'job[eq]geospatialRdd'
 ```
 
 You can combine multiple filters. Return all job runs from today (11/29/23) i.e. where the start date is greater than or equal to 11/29 and the end date is less than or equal to 11/30. Notice all times default to +00 UTC timezone.
@@ -324,45 +333,20 @@ cde resource list
 List all CDE Resources named "myScripts":
 
 ```
-cde resource list --filter 'name[eq]myScripts'
+cde resource list \
+  --filter 'name[eq]myScripts'
 ```
 
 List all CDE Resources of type Python Environment:
 
 ```
-cde resource list --filter 'type[eq]python-env'
+cde resource list \
+  --filter 'type[eq]python-env'
 ```
 
 #### Lab 7: Use the CLI to create a CDE Airflow Pipeline
 
 Create the CDE Spark jobs. Notice these are categorized into Bronze, Silver and Gold following a Lakehouse Data Architecture.
-
-```
-cde job create --name cde_spark_job_bronze_user001 \
-  --type spark \
-  --arg <your-hol-username-here> \
-  --arg <your-storage-location-here> \
-  --mount-1-resource sparkAppRepoPrdUser001 \
-  --python-env-resource-name Python-Env-Shared \
-  --executor-cores 2 \
-  --executor-memory "4g" \
-  --application-file de-pipeline/spark/001_Lakehouse_Bronze.py\
-  --vcluster-endpoint <your-PRD-vc-jobs-api-url-here>
-```
-
-```
-cde job create --name cde_spark_job_silver_user001 \
-  --type spark \
-  --arg <your-hol-username-here> \
-  --mount-1-resource sparkAppRepoPrdUser001 \
-  --python-env-resource-name Python-Env-Shared \
-  --executor-cores 2 \
-  --executor-memory "4g" \
-  --application-file de-pipeline/spark/002_Lakehouse_Silver.py\
-  --vcluster-endpoint <your-PRD-vc-jobs-api-url-here>
-```
-
-For example:
 
 ```
 cde job create --name cde_spark_job_a_user001 \
@@ -373,7 +357,8 @@ cde job create --name cde_spark_job_a_user001 \
   --python-env-resource-name Python-Env-Shared \
   --executor-cores 2 \
   --executor-memory "4g" \
-  --application-file code/spark/001_Lakehouse_Job.py
+  --application-file code/spark/001_Lakehouse_Job.py \
+  --acl-full-access-user "your-user-here"
 ```
 
 ```
@@ -384,7 +369,8 @@ cde job create --name cde_spark_job_b_user001 \
   --python-env-resource-name Python-Env-Shared \
   --executor-cores 2 \
   --executor-memory "4g" \
-  --application-file de-pipeline-bank/spark/002_Lakehouse_Job.py
+  --application-file de-pipeline-bank/spark/002_Lakehouse_Job.py \
+  --acl-full-access-user "your-user-here"
 ```
 
 In your editor, open the Airflow DAG "004_airflow_dag_git" and edit your username variable at line 54.
@@ -393,21 +379,14 @@ In your editor, open the Airflow DAG "004_airflow_dag_git" and edit your usernam
 
 Then create the CDE Airflow job. This job will orchestrate your Lakehouse Spark jobs above.
 
-```
-cde job create --name airflow-orchestration-user001 \
-  --type airflow \
-  --mount-1-resource sparkAppRepoPrdUser001 \
-  --dag-file code/airflow/003_airflow_dag.py\
-  --vcluster-endpoint <your-PRD-vc-jobs-api-url-here>
-```
-
 For example:
 
 ```
 cde job create --name airflow-orchestration-user001 \
   --type airflow \
   --mount-1-resource sparkAppRepoPrdUser001 \
-  --dag-file code/airflow/003_airflow_dag.py
+  --dag-file code/airflow/003_airflow_dag.py \
+  --acl-full-access-user "your-user-here"
 ```
 
 ![alt text](img/jobs-cde.png)

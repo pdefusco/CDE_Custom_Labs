@@ -173,19 +173,13 @@ Using the UI, you will build a CDE Repository and CDE Spark Job. Then, you will 
 Set the Jobs API Url variable to a value provided by your admin.
 
 ```
-export CDE_JOBS_API_URL="https://tgsn9958.cde-qngfhb5x.pdf-aw-c.a465-9q4k.cloudera.site/dex/api/v1"
-```
-
-```
 cde repository create --name sparkAppRepoDevUser001 \
   --branch main \
-  --url https://github.com/pdefusco/CDE_Custom_Labs.git \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+  --url https://github.com/pdefusco/CDE_Custom_Labs.git
 ```
 
 ```
-cde repository sync --name sparkAppRepoDevUser001 \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+cde repository sync --name sparkAppRepoDevUser001
 ```
 
 ![alt text](img/repos.png)
@@ -201,7 +195,6 @@ cde job create --name cde_spark_job_user001 \
   --executor-cores 2 \
   --executor-memory "2g" \
   --application-file pyspark-app.py\
-  --vcluster-endpoint <your-DEV-vc-jobs-api-url-here> \
   --arg <your-storage-location-here> \
   --arg <your-hol-username-here>
 ```
@@ -209,8 +202,7 @@ cde job create --name cde_spark_job_user001 \
 ```
 cde job run --name cde_spark_ob_user001 \
   --executor-cores 2 \
-  --executor-memory "2g" \
-  --vcluster-endpoint <your-DEV-vc-jobs-api-url-here>
+  --executor-memory "2g"
 ```
 
 
@@ -237,8 +229,7 @@ cde resource create \
   --acl-full-access-group group1 \            
   --acl-full-access-user user1 \    
   --acl-view-only-group group2 \               
-  --acl-view-only-user user2 \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+  --acl-view-only-user user2
 ```
 
 ```
@@ -246,8 +237,7 @@ cde resource upload \
   --name myProperties \
   --local-path cde_jobs/propertiesFile_1.conf \
   --local-path cde_jobs/propertiesFile_2.conf \
-  --local-path cde_jobs/sparkJob.py \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+  --local-path cde_jobs/sparkJob.py
 ```
 
 Create a CDE Job with ACL
@@ -259,16 +249,14 @@ cde job create \
   --mount-1-resource myProperties \
   --application-file sparkJob.py \
   --executor-cores 2 \
-  --executor-memory "2g" \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+  --executor-memory "2g"
 ```
 
 ```
 cde job run --name myPySparkJob \
 --arg MY_DB\
 --arg CUSTOMER_TABLE \
---arg propertiesFile_1.conf \
---vcluster-endpoint $CDE_JOBS_API_URL
+--arg propertiesFile_1.conf
 ```
 
 #### Lab 6: Use the CLI to explore CDE Job Runs, Definitions, and Artifacts
@@ -276,51 +264,44 @@ cde job run --name myPySparkJob \
 Explore jobs:
 
 ```
-cde job list --filter 'name[eq]myJob' \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+cde job list --filter 'name[eq]myJob'
 ```
 
 Filter all jobs where job application file equals "code/spark_geospatial.py":
 
 ```
-cde job list --filter 'spark.file[eq]code/myApp.py' \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+cde job list --filter 'spark.file[eq]code/myApp.py'
 ```
 
 You can use different operators. For example, search all jobs whose name contains "spark":
 
 ```
-cde job list --filter 'name[rlike]spark' \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+cde job list --filter 'name[rlike]spark'
 ```
 
 Search all jobs created on or after 11/23/23:
 
 ```
-cde job list --filter 'created[gte]2023-11-23' \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+cde job list --filter 'created[gte]2023-11-23'
 ```
 
 Search all jobs with executorCores less than 2:
 
 ```
-cde job list --filter 'spark.executorCores[lt]2' \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+cde job list --filter 'spark.executorCores[lt]2'
 ```
 
 List all runs for job "geospatialRdd":
 
 ```
-cde run list --filter 'job[eq]geospatialRdd' \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+cde run list --filter 'job[eq]geospatialRdd'
 ```
 
 You can combine multiple filters. Return all job runs from today (11/29/23) i.e. where the start date is greater than or equal to 11/29 and the end date is less than or equal to 11/30. Notice all times default to +00 UTC timezone.
 
 ```
 cde run list --filter 'started[gte]2023-11-29' \
-  --filter 'ended[lte]2023-11-30' \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+  --filter 'ended[lte]2023-11-30'
 ```
 
 List all successful airflow jobs run by user pauldefusco that started after 3 am UTC on 11/29/23:
@@ -329,29 +310,25 @@ List all successful airflow jobs run by user pauldefusco that started after 3 am
 cde run list --filter 'type[eq]airflow' \
   --filter 'status[eq]succeeded' \
   --filter 'user[eq]pauldefusco' \
-  --filter 'started[gte]2023-11-29T03' \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+  --filter 'started[gte]2023-11-29T03'
 ```
 
 List all CDE Resources will return all types ("python-env", "files", "custom-runtime-image"):
 
 ```
-cde resource list \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+cde resource list
 ```
 
 List all CDE Resources named "myScripts":
 
 ```
-cde resource list --filter 'name[eq]myScripts' \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+cde resource list --filter 'name[eq]myScripts'
 ```
 
 List all CDE Resources of type Python Environment:
 
 ```
-cde resource list --filter 'type[eq]python-env' \
-  --vcluster-endpoint $CDE_JOBS_API_URL
+cde resource list --filter 'type[eq]python-env'
 ```
 
 #### Lab 7: Use the CLI to create a CDE Airflow Pipeline
@@ -394,8 +371,7 @@ cde job create --name cde_spark_job_a_user001 \
   --python-env-resource-name Python-Env-Shared \
   --executor-cores 2 \
   --executor-memory "4g" \
-  --application-file code/spark/001_Lakehouse_Job.py\
-  --vcluster-endpoint $CDE_JOBS_API_URL
+  --application-file code/spark/001_Lakehouse_Job.py
 ```
 
 ```
@@ -406,8 +382,7 @@ cde job create --name cde_spark_job_b_user001 \
   --python-env-resource-name Python-Env-Shared \
   --executor-cores 2 \
   --executor-memory "4g" \
-  --application-file de-pipeline-bank/spark/002_Lakehouse_Job.py\
-  --vcluster-endpoint $CDE_JOBS_API_URL
+  --application-file de-pipeline-bank/spark/002_Lakehouse_Job.py
 ```
 
 In your editor, open the Airflow DAG "004_airflow_dag_git" and edit your username variable at line 54.
@@ -430,8 +405,7 @@ For example:
 cde job create --name airflow-orchestration-user001 \
   --type airflow \
   --mount-1-resource sparkAppRepoPrdUser001 \
-  --dag-file code/airflow/003_airflow_dag.py\
-  --vcluster-endpoint $CDE_JOBS_API_URL
+  --dag-file code/airflow/003_airflow_dag.py
 ```
 
 ![alt text](img/jobs-cde.png)

@@ -163,7 +163,7 @@ Next, generate a CDP access token and edit your CDP credentials.
 Using the API, run a CDE Spark Submit with the provided Pyspark and Iceberg application. Navigate to the CDE UI and look at the standard output.
 
 ```
-cde spark submit code/spark/icebergApp.py
+cde spark submit code/spark/sparkSubmitApp.py
 ```
 
 #### Lab 4: Create your First CDE Spark Job

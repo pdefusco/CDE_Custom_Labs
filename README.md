@@ -163,10 +163,53 @@ Next, generate a CDP access token and edit your CDP credentials.
 Using the API, run a CDE Spark Submit with the provided Pyspark and Iceberg application. Navigate to the CDE UI and look at the standard output.
 
 ```
-cde spark submit code/spark/sparkSubmitApp.py
+cde spark submit \
+  cdelab/code/spark/sparkSubmitApp.py \
+  --acl-view-only-user "your-user-here" \
+  --job-name "spark-submit-with-acl-username"
 ```
 
-#### Lab 4: Create your First CDE Spark Job
+#### Lab 4: Create yout First CDE Resource and Spark Job
+
+Create a CDE Files Resource with ACL
+
+```
+cde resource create \
+  --name filesResource \
+  --type files \
+  --acl-full-access-user "your-user-here" \                 
+  --acl-view-only-user "optional-user-here"
+```
+
+```
+cde resource upload \
+  --name myProperties \
+  --local-path code/spark/propertiesFile_1.conf \
+  --local-path code/spark/propertiesFile_2.conf \
+  --local-path code/spark/sparkJob.py
+```
+
+Create a CDE Job with ACL
+
+```
+cde job create \
+  --name sampleJob \
+  --type spark \
+  --mount-1-resource myProperties \
+  --application-file sparkJob.py \
+  --executor-cores 2 \
+  --executor-memory "2g" \
+  --acl-full-access-user "your-user-here"
+```
+
+```
+cde job run --name myPySparkJob \
+  --arg MY_DB\
+  --arg CUSTOMER_TABLE \
+  --arg propertiesFile_1.conf
+```
+
+#### Lab 5: Create your First CDE Spark Job
 
 Using the UI, you will build a CDE Repository and CDE Spark Job. Then, you will run the Job and learn about CDE built-in Observability features.
 
@@ -217,47 +260,6 @@ cde job run --name cde_spark_ob_user001 \
 ![alt text](img/cde-job-5.png)
 
 ![alt text](img/cde-job-6.png)
-
-#### Lab 5: Use CDE ACL's
-
-Create a CDE Files Resource with ACL
-
-```
-cde resource create \
-  --name filesResource \
-  --type files \
-  --acl-full-access-group group1 \            
-  --acl-full-access-user user1 \    
-  --acl-view-only-group group2 \               
-  --acl-view-only-user user2
-```
-
-```
-cde resource upload \
-  --name myProperties \
-  --local-path cde_jobs/propertiesFile_1.conf \
-  --local-path cde_jobs/propertiesFile_2.conf \
-  --local-path cde_jobs/sparkJob.py
-```
-
-Create a CDE Job with ACL
-
-```
-cde job create \
-  --name sampleJob \
-  --type spark \
-  --mount-1-resource myProperties \
-  --application-file sparkJob.py \
-  --executor-cores 2 \
-  --executor-memory "2g"
-```
-
-```
-cde job run --name myPySparkJob \
---arg MY_DB\
---arg CUSTOMER_TABLE \
---arg propertiesFile_1.conf
-```
 
 #### Lab 6: Use the CLI to explore CDE Job Runs, Definitions, and Artifacts
 

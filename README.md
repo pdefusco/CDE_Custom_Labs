@@ -160,7 +160,7 @@ Next, generate a CDP access token and edit your CDP credentials.
 
 #### Lab 3: Create your First CDE Spark Submit
 
-Using the API, run a CDE Spark Submit with the provided Pyspark and Iceberg application. Navigate to the CDE UI and look at the standard output.
+Using the API, run a CDE Spark Submit with the provided Pyspark application using your Service ID. Navigate to the CDE UI and look at the standard output.
 
 ```
 cde spark submit \
@@ -171,13 +171,13 @@ cde spark submit \
 
 #### Lab 4: Create yout First CDE Resource and Spark Job
 
-Create a CDE Files Resource with ACL
+Create a CDE Files Resource with ACL:
 
 ```
 cde resource create \
   --name filesResource \
   --type files \
-  --acl-full-access-user "your-user-here" \                 
+  --acl-full-access-group "your-service-id-group" \
   --acl-view-only-user "optional-user-here"
 ```
 
@@ -199,7 +199,7 @@ cde job create \
   --application-file sparkJob.py \
   --executor-cores 2 \
   --executor-memory "2g" \
-  --acl-full-access-user "your-user-here"
+  --acl-full-access-group "your-service-id-group"
 ```
 
 ```
@@ -215,12 +215,34 @@ Using the UI, you will build a CDE Repository and CDE Spark Job. Then, you will 
 
 Set the Jobs API Url variable to a value provided by your admin.
 
+Using your named User ID, create a CDE Credential to store your BitBucket login information.
+
 ```
-cde repository create --name sparkAppRepoDevUser001 \
-  --branch main \
-  --url https://github.com/pdefusco/CDE_Custom_Labs.git \
-  --acl-full-access-user "your-user-here"
+cde credential create \
+  --name "your-name-user-id-creds" \
+  --type basic \
+  --username "your-named-user-id"
 ```
+
+Validate that your credentials have been created:
+
+```
+cde credential list
+```
+
+Create a repository with your credentials. The service id group parameter will be provided to you by your admin.
+
+```
+cde repository create \
+  --name "your-repo-name" \
+    --branch develop \
+    --url https://zkzh1w7@scm.horizon.bankofamerica.com/scm/dap/cdp_utils.git \
+    --insecure-skip-tls \
+    --credential "your-name-user-id-creds" \
+    --acl-full-access-group "your-service-id-group"
+```
+
+Now sync your repository.
 
 ```
 cde repository sync \
@@ -233,16 +255,18 @@ cde repository sync \
 
 ![alt text](img/cde-repos-2.png)
 
+Update the job name parameter, the repo name parameter, storage location, username, and.
+
 ```
 cde job create --name cde_spark_job_user001 \
   --type spark \
-  --mount-1-resource sparkAppRepoDevUser001 \
+  --mount-1-resource "your-repo-name" \
   --executor-cores 2 \
   --executor-memory "2g" \
   --application-file pyspark-app.py\
-  --arg <your-storage-location-here> \
-  --arg <your-hol-username-here> \
-  --acl-full-access-user "your-user-here"
+  --arg "your-storage-location-here" \
+  --arg "your-hol-username-here" \
+  --acl-full-access-group "your-service-id-group"
 ```
 
 ```
@@ -348,45 +372,41 @@ cde resource list \
 
 Create the CDE Spark jobs. Notice these are categorized into Bronze, Silver and Gold following a Lakehouse Data Architecture.
 
+Update the storage location with the full path to your data.
+
 ```
 cde job create --name cde_spark_job_a_user001 \
   --type spark \
   --arg user001 \
-  --arg s3a://pdf-aw-buk-aec7c095/data/cde-demo/bank/20251210 \
-  --mount-1-resource sparkAppRepoPrdUser001 \
-  --python-env-resource-name Python-Env-Shared \
+  --arg "your-storage-location-here" \
+  --mount-1-resource "your-repo-name" \
   --executor-cores 2 \
-  --executor-memory "4g" \
+  --executor-memory "2g" \
   --application-file code/spark/001_Lakehouse_Job.py \
-  --acl-full-access-user "your-user-here"
+  --acl-full-access-group "your-service-id-group"
 ```
 
 ```
 cde job create --name cde_spark_job_b_user001 \
   --type spark \
   --arg user001 \
-  --mount-1-resource sparkAppRepoPrdUser001 \
-  --python-env-resource-name Python-Env-Shared \
+  --mount-1-resource "your-repo-name" \
   --executor-cores 2 \
-  --executor-memory "4g" \
-  --application-file de-pipeline-bank/spark/002_Lakehouse_Job.py \
-  --acl-full-access-user "your-user-here"
+  --executor-memory "2g" \
+  --application-file code/spark/002_Lakehouse_Job.py \
+  --acl-full-access-group "your-service-id-group"
 ```
 
-In your editor, open the Airflow DAG "004_airflow_dag_git" and edit your username variable at line 54.
-
-![alt text](img/username-dag.png)
-
-Then create the CDE Airflow job. This job will orchestrate your Lakehouse Spark jobs above.
+Next, create the CDE Airflow job. This job will orchestrate your Lakehouse Spark jobs above. Before running the command, update the job name reflecting your lab username.
 
 For example:
 
 ```
 cde job create --name airflow-orchestration-user001 \
   --type airflow \
-  --mount-1-resource sparkAppRepoPrdUser001 \
+  --mount-1-resource "your-repo-name" \
   --dag-file code/airflow/003_airflow_dag.py \
-  --acl-full-access-user "your-user-here"
+  --acl-full-access-group "your-service-id-group"
 ```
 
 ![alt text](img/jobs-cde.png)

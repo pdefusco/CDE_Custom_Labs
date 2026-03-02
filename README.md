@@ -209,7 +209,7 @@ cde job run --name myPySparkJob \
   --arg propertiesFile_1.conf
 ```
 
-#### Lab 5: Create your First CDE Spark Job
+#### Lab 5: Create your First CDE Spark Job with CI/CD Repositories
 
 Using the UI, you will build a CDE Repository and CDE Spark Job. Then, you will run the Job and learn about CDE built-in Observability features.
 
